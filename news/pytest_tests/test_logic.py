@@ -2,7 +2,7 @@ from http import HTTPStatus
 from django.urls import reverse
 import pytest
 
-from news.models import Comment, News
+from news.models import Comment
 
 from news.forms import BAD_WORDS, WARNING
 
@@ -38,7 +38,7 @@ def test_user_cant_use_bad_words(author_client, news_url):
     assert comments_count == 0
 
 
-def test_author_can_delete_comment(author_client, delete_url,news_url,):
+def test_author_can_delete_comment(author_client, delete_url, news_url,):
     response = author_client.delete(delete_url)
     url_to_comments = news_url + '#comments'
     assertRedirects(response, url_to_comments)

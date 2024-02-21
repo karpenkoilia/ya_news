@@ -1,14 +1,12 @@
-from django.test import SimpleTestCase
 import pytest
 
 from django.conf import settings
 from django.urls import reverse
 
 
-
 @pytest.mark.django_db
 def test_news_count(client, home_url, all_news):
-    response =client.get(home_url)
+    response = client.get(home_url)
     object_list = response.context['object_list']
     news_count = len(object_list)
     assert news_count == settings.NEWS_COUNT_ON_HOME_PAGE
@@ -40,7 +38,7 @@ def test_anonymous_client_has_no_form(client, news, news_id_for_args):
     assert 'form' not in response.context
 
 
-@pytest.mark.django_db 
+@pytest.mark.django_db
 def test_authorized_client_has_form(author_client,
                                     news, news_id_for_args):
     url = reverse('news:detail', args=news_id_for_args)

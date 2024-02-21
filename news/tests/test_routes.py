@@ -22,7 +22,7 @@ class TestRoutes(TestCase):
             news=cls.news,
             author=cls.author,
             text='Текст комментария'
-        ) 
+        )
 
     def test_pages_availability(self):
         # Создаём набор тестовых данных - кортеж кортежей.
@@ -35,7 +35,7 @@ class TestRoutes(TestCase):
             ('users:logout', None),
             ('users:signup', None),
         )
-        # Итерируемся по внешнему кортежу 
+        # Итерируемся по внешнему кортежу
         # и распаковываем содержимое вложенных кортежей:
         for name, args in urls:
             with self.subTest(name=name):
