@@ -14,16 +14,15 @@ from django.urls import reverse
         ('users:login', None),
         ('users:logout', None),
         ('users:signup', None),))
-def test_pages_availability(db, client, name, args,):
+def test_pages_availability(client, name, args,):
     url = reverse(name, args=args)
     response = client.get(url)
     assert response.status_code == HTTPStatus.OK
 
 
-@pytest.mark.django_db
 @pytest.mark.parametrize("user, status", [
-    (pytest.lazy_fixture('author'), HTTPStatus.NOT_FOUND),
-    (pytest.lazy_fixture('author_client'), HTTPStatus.OK),
+    (pytest.lazy_fixture('reader'), HTTPStatus.NOT_FOUND),
+    (pytest.lazy_fixture('author'), HTTPStatus.OK),
 ])
 def test_availability_for_comment_edit_and_delete(
     client, comment_obj, user, status):
@@ -34,8 +33,9 @@ def test_availability_for_comment_edit_and_delete(
         assert response.status_code == status
 
 
+@pytest.mark.django_db
 @pytest.mark.parametrize(
-    'name, news_object',
+    'name, args',
     (
     ('news:edit', pytest.lazy_fixture('comment_id_for_args')),
     ('news:delete', pytest.lazy_fixture('comment_id_for_args'))

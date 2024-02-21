@@ -1,6 +1,7 @@
 from django.urls import reverse
 from django.utils import timezone
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 
 from datetime import datetime, timedelta
 
@@ -15,11 +16,22 @@ from news.models import News, Comment
 def author(django_user_model):  
     return django_user_model.objects.create(username='Автор')
 
+
 # Фикстура создающая залогиненного юзера.
 @pytest.fixture
 def author_client(author, client):
     client.force_login(author)
     return client
+
+@pytest.fixture
+def reader(django_user_model):
+    return django_user_model.objects.create(username='Читатель')
+
+@pytest.fixture
+def reader_client(reader, client):
+    client.force_login(reader)
+    return client    
+
 
 @pytest.fixture
 def news():
@@ -28,6 +40,7 @@ def news():
         text='Текст',
     )
     return news
+
 
 @pytest.fixture
 def comment_obj(author, news):
@@ -38,6 +51,7 @@ def comment_obj(author, news):
         )
     return comment
 
+
 @pytest.fixture
 # Фикстура запрашивает другую фикстуру создания заметки.
 def news_id_for_args(news):  
@@ -45,9 +59,11 @@ def news_id_for_args(news):
     # На то, что это кортеж, указывает запятая в конце выражения.
     return news.id,
 
+
 @pytest.fixture
-def comment_id_for_args(comment):
-    return comment.id,
+def comment_id_for_args(comment_obj):
+    return comment_obj.id,
+
 
 @pytest.fixture
 def all_news():
@@ -61,17 +77,16 @@ def all_news():
         ]
     News.objects.bulk_create(all_news)
 
-@pytest.fixture
-def detail_url():
-    detail_url = reverse('news:detail', args=(news_id_for_args,))
-    return detail_url
+
+
 
 @pytest.fixture
 def home_url():
     return reverse('news:home')
 
+
 @pytest.fixture
-def comments_for_test_order():
+def comments_for_test_order(news, author):
     now = timezone.now()
     for index in range(2):
         comment = Comment.objects.create(
@@ -81,6 +96,34 @@ def comments_for_test_order():
             # И сохраняем эти изменения.
         comment.save()
 
+
 @pytest.fixture
-def db():
-    return db
+def comment_text():
+    return 'Текст комментария'
+
+@pytest.fixture
+def form_data(comment_text):
+    return {'text': comment_text}
+
+@pytest.fixture
+def new_comment_text():
+    return 'Новый текст комментария'
+
+@pytest.fixture
+def form_data_update(new_comment_text):
+    return {'text': new_comment_text}
+
+
+@pytest.fixture
+def edit_url(comment_id_for_args):
+    return reverse('news:edit', args=comment_id_for_args)
+
+
+@pytest.fixture
+def delete_url(comment_id_for_args):
+    return reverse('news:delete', args=comment_id_for_args)
+
+
+@pytest.fixture
+def news_url(news):
+    return reverse('news:detail', args=(news.id,))
